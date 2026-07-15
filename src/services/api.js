@@ -195,3 +195,82 @@ export const sendSmsAlert = async (phone, message) => {
 export const analyzeForestry = async (lat, lon) => {
   return new Promise((resolve) => setTimeout(() => resolve(MOCK_FORESTRY_ANALYSIS), 1500));
 };
+
+// --- REAL BACKEND INTEGRATION ---
+
+const BACKEND_URL = 'http://localhost:5000/api/v1';
+
+export const loginUser = async (email, password) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+    return data;
+  } catch (error) {
+    if (error.message.includes('Failed to fetch')) {
+      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running on port 5000.");
+    }
+    throw error;
+  }
+};
+
+export const registerUser = async (name, email, password) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Registration failed');
+    return data;
+  } catch (error) {
+    if (error.message.includes('Failed to fetch')) {
+      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running on port 5000.");
+    }
+    throw error;
+  }
+};
+
+export const fetchPlans = async () => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/plans`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch plans');
+    return data;
+  } catch (error) {
+    console.error("Fetch Plans Error:", error);
+    return [];
+  }
+};
+
+export const subscribeToPlan = async (planId, token) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/subscriptions`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ planId })
+    });
+    const data = await res.json();
+    if (res.status === 401) {
+      // Token is invalid/expired — clear it so user is forced to login again
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      throw new Error('Session expired. Please sign out and log in again.');
+    }
+    if (!res.ok) throw new Error(data.message || 'Subscription failed');
+    return data;
+  } catch (error) {
+    if (error.message.includes('Failed to fetch')) {
+      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running.");
+    }
+    throw error;
+  }
+};

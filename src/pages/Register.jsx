@@ -1,27 +1,41 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !password) {
-      setError('Please fill in all fields');
+      toast.error('Please fill in all fields', { style: { background: '#333', color: '#fff' }});
       return;
     }
     
-    // Simulate API delay
-    setTimeout(() => {
-      login(email);
-      navigate('/'); // Redirect to dashboard
-    }, 500);
+    const toastId = toast.loading('Creating account...', { style: { background: '#333', color: '#fff' }});
+    const result = await register(name, email, password);
+    toast.dismiss(toastId);
+    
+    if (result.success) {
+      Swal.fire({
+        title: 'Welcome to WeatherAI!',
+        text: 'Your premium account has been successfully created.',
+        icon: 'success',
+        background: '#1a1a2e',
+        color: '#fff',
+        confirmButtonColor: '#38bdf8'
+      }).then(() => {
+        navigate('/');
+      });
+    } else {
+      toast.error(result.error || 'Registration failed', { style: { background: '#333', color: '#fff' }});
+    }
   };
 
   return (
@@ -31,12 +45,6 @@ export default function Register() {
           <h2 className="auth-title">Create Account</h2>
           <p className="auth-subtitle">Join the premium weather intelligence platform</p>
         </div>
-        
-        {error && (
-          <div className="bg-danger-color/20 border border-danger-color text-danger-color p-3 rounded-lg mb-4 text-sm text-center">
-            {error}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit}>
           <div className="auth-input-group">

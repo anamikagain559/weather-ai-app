@@ -1,26 +1,42 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please fill in all fields');
+      toast.error('Please fill in all fields', { style: { background: '#333', color: '#fff' }});
       return;
     }
     
-    // Simulate API delay
-    setTimeout(() => {
-      login(email);
-      navigate('/'); // Redirect to dashboard
-    }, 500);
+    const toastId = toast.loading('Signing in...', { style: { background: '#333', color: '#fff' }});
+    const result = await login(email, password);
+    toast.dismiss(toastId);
+    
+    if (result.success) {
+      Swal.fire({
+        title: 'Welcome Back!',
+        text: 'Successfully logged in to WeatherAI.',
+        icon: 'success',
+        background: '#1a1a2e',
+        color: '#fff',
+        confirmButtonColor: '#38bdf8',
+        timer: 2000,
+        showConfirmButton: false
+      }).then(() => {
+        navigate('/');
+      });
+    } else {
+      toast.error(result.error || 'Login failed. Please check your credentials.', { style: { background: '#333', color: '#fff' }});
+    }
   };
 
   return (
@@ -30,12 +46,6 @@ export default function Login() {
           <h2 className="auth-title">Welcome Back</h2>
           <p className="auth-subtitle">Sign in to your premium account</p>
         </div>
-        
-        {error && (
-          <div className="bg-danger-color/20 border border-danger-color text-danger-color p-3 rounded-lg mb-4 text-sm text-center">
-            {error}
-          </div>
-        )}
         
         <form onSubmit={handleSubmit}>
           <div className="auth-input-group">
