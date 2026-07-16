@@ -6,15 +6,19 @@ import AiSummaryCard from '../components/AiSummaryCard';
 import AlertsBanner from '../components/AlertsBanner';
 import AqiMeter from '../components/AqiMeter';
 import HourlyChart from '../components/HourlyChart';
-import { fetchWeather, fetchForecast, fetchHourlyForecast, fetchAiInsights, fetchAlerts, fetchAqi } from '../services/api';
+import NearbyCities from '../components/NearbyCities';
+import ExtendedForecast from '../components/ExtendedForecast';
+import { fetchWeather, fetchForecast, fetchHourlyForecast, fetchAiInsights, fetchAlerts, fetchAqi, fetch14DayForecast } from '../services/api';
 
 export default function Home() {
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
+  const [forecast14, setForecast14] = useState(null);
   const [hourlyForecast, setHourlyForecast] = useState(null);
   const [aiInsights, setAiInsights] = useState(null);
   const [alertsData, setAlertsData] = useState(null);
   const [aqiData, setAqiData] = useState(null);
+  const [nearbyCitiesData, setNearbyCitiesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -22,20 +26,27 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const [weatherData, forecastData, hourlyData, aiData, alerts, aqi] = await Promise.all([
+      const nearbyCitiesList = ['Chittagong', 'Sylhet', 'Rajshahi'];
+      
+      const [weatherData, forecastData, forecast14Data, hourlyData, aiData, alerts, aqi, ...nearbyData] = await Promise.all([
         fetchWeather(city),
         fetchForecast(city),
+        fetch14DayForecast(city),
         fetchHourlyForecast(city),
         fetchAiInsights(city),
         fetchAlerts(city),
-        fetchAqi(city)
+        fetchAqi(city),
+        ...nearbyCitiesList.map(c => fetchWeather(c))
       ]);
+      
       setCurrentWeather(weatherData);
       setForecast(forecastData);
+      setForecast14(forecast14Data);
       setHourlyForecast(hourlyData);
       setAiInsights(aiData);
       setAlertsData(alerts);
       setAqiData(aqi);
+      setNearbyCitiesData(nearbyData);
     } catch (err) {
       setError('Failed to fetch weather data. Please try again.');
     } finally {
@@ -53,40 +64,49 @@ export default function Home() {
   };
 
   return (
-    <div className="app-container container">
+    <div className="flex flex-col min-h-screen max-w-[1400px] mx-auto px-6 md:px-16 w-full pb-16">
       
-      <div className="flex flex-col items-center mb-8 fade-in" style={{ animationDelay: '0.1s' }}>
-        <h2 className="text-4xl text-center mb-4">Discover the weather in your city</h2>
+      <div className="flex flex-col items-center mb-12 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-6 tracking-tight text-whiteBright">Discover the weather in your city</h2>
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      {loading && <div className="spinner"></div>}
+      {loading && (
+        <div className="w-10 h-10 border-4 border-borderTint border-t-accent rounded-full animate-spin mx-auto my-12"></div>
+      )}
       
       {error && (
-        <div className="glass-panel p-6 text-center" style={{ borderColor: 'var(--danger-color)' }}>
+        <div className="glass-panel p-6 text-center border-danger/50">
           <p className="text-danger font-medium">{error}</p>
         </div>
       )}
 
       {!loading && !error && (
-        <>
-          <AlertsBanner alertsData={alertsData} />
-          <div className="main-dashboard-grid mt-6 fade-in" style={{ animationDelay: '0.2s' }}>
-            <div className="dashboard-top">
-              <AiSummaryCard data={aiInsights} />
-            </div>
+        <div className="flex flex-col w-full gap-6">
+          
+          <div className="grid grid-cols-1 xl:grid-cols-[1.2fr_1fr] gap-6 animate-fade-in w-full" style={{ animationDelay: '0.2s' }}>
             
-            <div className="dashboard-left flex flex-col gap-6">
-              <CurrentWeather data={currentWeather} />
+            {/* Left Column (Hero) */}
+            <div className="flex flex-col gap-6 w-full min-w-0">
+              <CurrentWeather data={currentWeather} forecast={forecast} />
+              <NearbyCities citiesData={nearbyCitiesData} />
               <AqiMeter data={aqiData} />
             </div>
             
-            <div className="dashboard-right flex flex-col gap-6">
+            {/* Right Column */}
+            <div className="flex flex-col gap-6 w-full min-w-0">
               <HourlyChart data={hourlyForecast} />
-              <Forecast data={forecast} />
+              <Forecast data={forecast} location={currentWeather?.location} current={currentWeather?.current} />
             </div>
           </div>
-        </>
+
+          {/* Bottom Full-Width Sections */}
+          <div className="flex flex-col gap-6 animate-fade-in w-full" style={{ animationDelay: '0.3s' }}>
+            <AlertsBanner alertsData={alertsData} />
+            <AiSummaryCard data={aiInsights} />
+            <ExtendedForecast data={forecast14} />
+          </div>
+        </div>
       )}
     </div>
   );

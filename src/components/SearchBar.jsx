@@ -12,9 +12,9 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <form className="search-wrapper fade-in" onSubmit={handleSubmit}>
+    <form className="relative w-full max-w-[400px] animate-fade-in" onSubmit={handleSubmit}>
       <svg 
-        className="search-icon" 
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-muted pointer-events-none" 
         width="20" 
         height="20" 
         viewBox="0 0 24 24" 
@@ -29,7 +29,7 @@ const SearchBar = ({ onSearch }) => {
       </svg>
       <input 
         type="text" 
-        className="search-input" 
+        className="w-full pl-[48px] pr-5 py-3 bg-card border border-border rounded-full text-white font-sans text-base transition-all outline-none focus:border-accent focus:bg-white/5 focus:ring-4 focus:ring-accent/15" 
         placeholder="Search for a city..." 
         value={query}
         onChange={(e) => setQuery(e.target.value)}

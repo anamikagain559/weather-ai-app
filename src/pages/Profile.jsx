@@ -107,35 +107,9 @@ export default function Profile() {
   const hasActive = activeCount > 0;
 
   return (
-    <div className="wx-page min-h-screen pt-12 pb-24 text-slate-200 relative selection:bg-sky-500/30">
-      {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-sky-900/20 via-[#0b1120] to-[#0b1120] -z-10"></div>
+    <div className="min-h-screen pt-12 pb-24 text-textPrimary relative z-10 selection:bg-accent/30">
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
-
-        .wx-page { font-family: 'Inter', system-ui, sans-serif; }
-        .wx-display { font-family: 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.02em; }
-        
-        .glass-panel {
-          background: rgba(255, 255, 255, 0.03);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        .wx-eyebrow {
-          font-family: 'Space Grotesk', sans-serif;
-          font-size: 11px;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: rgba(14, 165, 233, 0.7);
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-        }
-
         .wx-radar {
           position: relative;
           width: 120px; height: 120px;
@@ -143,11 +117,11 @@ export default function Profile() {
         .wx-radar .ring {
           position: absolute; inset: 0;
           border-radius: 999px;
-          border: 1px solid rgba(14,165,233,0.4);
+          border: 1px solid rgba(42,245,200,0.4);
           animation: wx-sweep 3.5s cubic-bezier(0.1, 0.7, 1, 0.1) infinite;
         }
-        .wx-radar .ring:nth-child(2) { animation-delay: 1.2s; border-color: rgba(56,189,248,0.3); }
-        .wx-radar .ring:nth-child(3) { animation-delay: 2.4s; border-color: rgba(2,132,199,0.2); }
+        .wx-radar .ring:nth-child(2) { animation-delay: 1.2s; border-color: rgba(58,142,255,0.3); }
+        .wx-radar .ring:nth-child(3) { animation-delay: 2.4s; border-color: rgba(42,245,200,0.2); }
         @keyframes wx-sweep {
           0% { transform: scale(0.7); opacity: 1; }
           100% { transform: scale(1.6); opacity: 0; }
@@ -161,14 +135,14 @@ export default function Profile() {
 
         {/* Header Section */}
         <div className="flex flex-col items-center mb-24 text-center">
-          <span className="wx-eyebrow mb-5 bg-sky-950/40 px-5 py-2 rounded-full border border-sky-900/50">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+          <span className="text-[11px] uppercase tracking-[0.25em] font-bold text-accent mb-5 bg-accent/10 px-5 py-2 rounded-full border border-accent/20 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_#2af5c8]"></span>
             Station report &middot; account overview
           </span>
-          <h2 className="wx-display text-4xl md:text-5xl font-bold mb-5 text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-5 text-whiteBright">
             Account Settings
           </h2>
-          <p className="text-slate-400 text-lg max-w-lg mt-2 mb-4">Manage your profile details and monitor active weather intelligence subscriptions.</p>
+          <p className="text-muted text-lg max-w-lg mt-2 mb-4">Manage your profile details and monitor active weather intelligence subscriptions.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -183,12 +157,12 @@ export default function Profile() {
                 <span className="ring"></span>
                 <span className="ring"></span>
                 <span className="ring"></span>
-                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-4xl font-bold text-white shadow-[0_0_30px_rgba(14,165,233,0.3)] border-4 border-[#0f172a] wx-display z-10">
+                <div className="relative w-24 h-24 rounded-full bg-hero-gradient flex items-center justify-center text-4xl font-extrabold text-ink shadow-[0_0_30px_rgba(42,245,200,0.3)] border-4 border-ink z-10">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
               </div>
 
-              <h3 className="wx-display text-2xl font-bold mb-2 relative z-10 text-white">{user.name}</h3>
+              <h3 className="text-2xl font-bold mb-2 relative z-10 text-whiteBright">{user.name}</h3>
               <p className="text-slate-400 mb-6 relative z-10 flex items-center gap-2 justify-center text-sm">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                 {user.email}
@@ -209,11 +183,11 @@ export default function Profile() {
 
           {/* Right Column: Subscription History */}
           <div className="lg:col-span-8">
-            <div className="glass-panel rounded-[3rem] p-8 h-full flex flex-col">
-              <div className="flex items-center justify-between border-b border-slate-800/60 pb-5 mb-6">
-                <h3 className="wx-display text-2xl font-bold flex items-center gap-3 text-white">
-                  <div className="w-10 h-10 rounded-[18px] bg-sky-500/10 flex items-center justify-center border border-sky-500/20">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--tw-colors-sky-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <div className="glass-panel rounded-[2.5rem] p-8 h-full flex flex-col border border-borderTint">
+              <div className="flex items-center justify-between border-b border-white/5 pb-5 mb-6">
+                <h3 className="text-2xl font-extrabold flex items-center gap-3 text-whiteBright">
+                  <div className="w-10 h-10 rounded-[12px] bg-accent/10 flex items-center justify-center border border-accent/20 text-accent">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                   </div>
                   Billing & Subscriptions
                 </h3>
@@ -232,22 +206,22 @@ export default function Profile() {
                     const canCancel = isActive || isPending;
 
                     const getStatusStyles = (status) => {
-                      if (status === 'active') return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', text: 'text-emerald-400', dot: 'bg-emerald-400', cardBg: 'bg-slate-900/40', iconBg: 'bg-emerald-500/10 text-emerald-400' };
-                      if (status === 'pending') return { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', dot: 'bg-amber-400', cardBg: 'bg-slate-900/40', iconBg: 'bg-amber-500/10 text-amber-400' };
-                      if (status === 'cancelled') return { bg: 'bg-rose-500/10', border: 'border-rose-500/30', text: 'text-rose-400', dot: 'bg-rose-400', cardBg: 'bg-slate-900/40', iconBg: 'bg-rose-500/10 text-rose-400' };
-                      return { bg: 'bg-slate-800', border: 'border-slate-700', text: 'text-slate-400', dot: 'bg-slate-500', cardBg: 'bg-slate-900/40', iconBg: 'bg-slate-800/50 text-slate-400' };
+                      if (status === 'active') return { bg: 'bg-[#2af5c8]/10', border: 'border-[#2af5c8]/30', text: 'text-[#2af5c8]', dot: 'bg-[#2af5c8]', cardBg: 'bg-surface', iconBg: 'bg-[#2af5c8]/10 text-[#2af5c8]' };
+                      if (status === 'pending') return { bg: 'bg-[#ff6b35]/10', border: 'border-[#ff6b35]/30', text: 'text-[#ff6b35]', dot: 'bg-[#ff6b35]', cardBg: 'bg-surface', iconBg: 'bg-[#ff6b35]/10 text-[#ff6b35]' };
+                      if (status === 'cancelled') return { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400', dot: 'bg-red-400', cardBg: 'bg-surface', iconBg: 'bg-red-500/10 text-red-400' };
+                      return { bg: 'bg-panel2', border: 'border-white/10', text: 'text-muted', dot: 'bg-muted', cardBg: 'bg-surface', iconBg: 'bg-panel2 text-muted' };
                     };
 
                     const style = getStatusStyles(sub.status);
 
                     return (
-                      <div key={sub._id} className={`group ${style.cardBg} border border-slate-700/50 p-6 sm:p-7 rounded-[2rem] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative transition-all duration-300 hover:bg-slate-800/40 hover:border-slate-600`}>
+                      <div key={sub._id} className={`group ${style.cardBg} border border-borderTint p-6 sm:p-7 rounded-[2rem] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative transition-all duration-300 hover:bg-white/5 hover:border-accent/30`}>
                         <div className="flex-1 w-full">
-                          <div className="flex flex-wrap items-center gap-4 mb-4 border-b border-slate-800/60 pb-4">
-                            <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-slate-700/50 ${style.iconBg}`}>
+                          <div className="flex flex-wrap items-center gap-4 mb-4 border-b border-white/5 pb-4">
+                            <span className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border border-white/5 ${style.iconBg}`}>
                               <ConditionIcon status={sub.status} />
                             </span>
-                            <h4 className="wx-display text-2xl font-bold capitalize text-white">
+                            <h4 className="text-xl font-extrabold capitalize text-whiteBright">
                               {sub.planId?.name || 'Unknown Plan'}
                             </h4>
                             <span className={`text-[11px] px-3 py-1 rounded-full border ${style.border} ${style.text} bg-transparent uppercase tracking-widest font-bold flex items-center gap-2 ml-auto sm:ml-0`}>

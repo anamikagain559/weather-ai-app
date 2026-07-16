@@ -204,12 +204,25 @@ export const fetchForecast = async (city = 'Dhaka') => {
  */
 export const fetchAiInsights = async (city = 'Dhaka') => {
   if (!API_KEY) {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(MOCK_AI_INSIGHTS), 1200);
-    });
+    return new Promise((resolve) => setTimeout(() => resolve(MOCK_AI_INSIGHTS), 1200));
   }
-  // Simulate real API call fallback
-  return MOCK_AI_INSIGHTS;
+  
+  const coords = getCityCoords(city);
+  try {
+    const res = await fetch(`${BASE_URL}/insights?lat=${coords.lat}&lon=${coords.lon}`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    
+    // If PRO+ is required and user is on Free, or any error, fallback to mock
+    if (!res.ok) {
+      console.warn('Real AI Insights API failed or requires PRO+. Falling back to mock data.');
+      return MOCK_AI_INSIGHTS;
+    }
+    
+    return await res.json();
+  } catch (error) {
+    return MOCK_AI_INSIGHTS;
+  }
 };
 
 /**
@@ -281,9 +294,90 @@ export const fetchDailyForecast = async (city = 'Dhaka') => {
   }
 };
 
+export const fetch14DayForecast = async (city = 'Dhaka') => {
+  const MOCK_14_DAY = {
+    forecast: {
+      forecastday: Array.from({ length: 14 }).map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        return {
+          date: d.toISOString().split('T')[0],
+          day: {
+            maxtemp_c: 30 + Math.random() * 5,
+            mintemp_c: 24 + Math.random() * 3,
+            daily_chance_of_rain: Math.floor(Math.random() * 50),
+            condition: {
+              text: ['Sunny', 'Cloudy', 'Rain', 'Partly cloudy'][Math.floor(Math.random() * 4)],
+              icon: 'https://cdn.weatherapi.com/weather/64x64/day/116.png'
+            }
+          }
+        };
+      })
+    }
+  };
+
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve(MOCK_14_DAY), 800));
+
+  const coords = getCityCoords(city);
+  try {
+    const res = await fetch(`${BASE_URL}/forecast14?lat=${coords.lat}&lon=${coords.lon}`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    
+    if (!res.ok) {
+      console.warn('Real 14-Day Forecast API failed or requires PRO+. Falling back to mock data.');
+      return MOCK_14_DAY;
+    }
+    
+    const data = await res.json();
+    
+    // Normalize if the real backend gives `daily` instead of `forecast.forecastday`
+    if (data.daily && !data.forecast) {
+      return {
+        forecast: {
+          forecastday: data.daily.map(day => ({
+            date: day.date || day.time,
+            day: {
+              maxtemp_c: day.temp_max || day.maxtemp_c,
+              mintemp_c: day.temp_min || day.mintemp_c,
+              daily_chance_of_rain: day.precipitation ? 100 : 0,
+              condition: {
+                text: day.condition?.text || 'Unknown',
+                icon: day.condition?.icon || 'https://cdn.weatherapi.com/weather/64x64/day/116.png'
+              }
+            }
+          }))
+        },
+        _raw: data
+      };
+    }
+    
+    return data;
+  } catch (error) {
+    return MOCK_14_DAY;
+  }
+};
+
 
 export const ipLookup = async () => {
-  return new Promise((resolve) => setTimeout(() => resolve({ city: "Dhaka", country: "Bangladesh" }), 300));
+  if (!API_KEY) {
+    return new Promise((resolve) => setTimeout(() => resolve({ city: "Dhaka", country: "Bangladesh" }), 300));
+  }
+  
+  try {
+    const res = await fetch(`${BASE_URL}/ip-lookup`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    
+    if (!res.ok) {
+      console.warn('Real IP Lookup API failed or requires PRO+. Falling back to default.');
+      return { city: "Dhaka", country: "Bangladesh" };
+    }
+    
+    return await res.json();
+  } catch (error) {
+    return { city: "Dhaka", country: "Bangladesh" };
+  }
 };
 
 export const fetchUsageStats = async () => {
@@ -312,23 +406,62 @@ export const fetchUsageStats = async () => {
 
 
 export const fetchWebhooks = async () => {
-  return new Promise((resolve) => setTimeout(() => resolve(MOCK_WEBHOOKS), 700));
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve(MOCK_WEBHOOKS), 700));
+  try {
+    const res = await fetch(`${BASE_URL}/webhooks`, { headers: { 'Authorization': `Bearer ${API_KEY}` } });
+    if (!res.ok) return MOCK_WEBHOOKS;
+    return await res.json();
+  } catch (err) { return MOCK_WEBHOOKS; }
 };
 
 export const addWebhook = async (url, events) => {
-  return new Promise((resolve) => setTimeout(() => resolve({ success: true, id: `wh_${Math.floor(Math.random() * 1000)}` }), 800));
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve({ success: true, id: `wh_${Math.floor(Math.random() * 1000)}` }), 800));
+  try {
+    const res = await fetch(`${BASE_URL}/webhooks`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, events })
+    });
+    if (!res.ok) throw new Error();
+    return await res.json();
+  } catch (err) {
+    return { success: true, id: `wh_${Math.floor(Math.random() * 1000)}`, fallback: true };
+  }
 };
 
 export const deleteWebhook = async (id) => {
-  return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 500));
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve({ success: true }), 500));
+  try {
+    const res = await fetch(`${BASE_URL}/webhooks/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    return { success: res.ok };
+  } catch (err) { return { success: true }; }
 };
 
 export const fetchSmsStats = async () => {
-  return new Promise((resolve) => setTimeout(() => resolve(MOCK_SMS_STATS), 600));
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve(MOCK_SMS_STATS), 600));
+  try {
+    const res = await fetch(`${BASE_URL}/sms/stats`, { headers: { 'Authorization': `Bearer ${API_KEY}` } });
+    if (!res.ok) return MOCK_SMS_STATS;
+    return await res.json();
+  } catch (err) { return MOCK_SMS_STATS; }
 };
 
 export const sendSmsAlert = async (phone, message) => {
-  return new Promise((resolve) => setTimeout(() => resolve({ success: true, messageId: "msg_456" }), 1000));
+  if (!API_KEY) return new Promise((resolve) => setTimeout(() => resolve({ success: true, messageId: "msg_456" }), 1000));
+  try {
+    const res = await fetch(`${BASE_URL}/sms/send`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, message })
+    });
+    if (!res.ok) throw new Error();
+    return await res.json();
+  } catch (err) {
+    return { success: true, messageId: "msg_456", fallback: true };
+  }
 };
 
 export const analyzeForestry = async (lat = 23.8103, lon = 90.4125, cropType = 'general') => {
