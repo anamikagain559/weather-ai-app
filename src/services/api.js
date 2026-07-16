@@ -69,14 +69,14 @@ const MOCK_ALERTS = {
 
 // City name → lat/lon lookup (common cities)
 const CITY_COORDS = {
-  dhaka:      { lat: 23.8103, lon: 90.4125, name: 'Dhaka',      country: 'Bangladesh' },
+  dhaka: { lat: 23.8103, lon: 90.4125, name: 'Dhaka', country: 'Bangladesh' },
   chittagong: { lat: 22.3569, lon: 91.7832, name: 'Chittagong', country: 'Bangladesh' },
-  sylhet:     { lat: 24.8949, lon: 91.8687, name: 'Sylhet',     country: 'Bangladesh' },
-  khulna:     { lat: 22.8456, lon: 89.5403, name: 'Khulna',     country: 'Bangladesh' },
-  rajshahi:   { lat: 24.3745, lon: 88.6042, name: 'Rajshahi',   country: 'Bangladesh' },
-  london:     { lat: 51.5074, lon: -0.1278, name: 'London',     country: 'UK' },
-  'new york': { lat: 40.7128, lon: -74.0060, name: 'New York',  country: 'US' },
-  dubai:      { lat: 25.2048, lon: 55.2708, name: 'Dubai',      country: 'UAE' },
+  sylhet: { lat: 24.8949, lon: 91.8687, name: 'Sylhet', country: 'Bangladesh' },
+  khulna: { lat: 22.8456, lon: 89.5403, name: 'Khulna', country: 'Bangladesh' },
+  rajshahi: { lat: 24.3745, lon: 88.6042, name: 'Rajshahi', country: 'Bangladesh' },
+  london: { lat: 51.5074, lon: -0.1278, name: 'London', country: 'UK' },
+  'new york': { lat: 40.7128, lon: -74.0060, name: 'New York', country: 'US' },
+  dubai: { lat: 25.2048, lon: 55.2708, name: 'Dubai', country: 'UAE' },
 };
 
 const getCityCoords = (city) => {
@@ -87,25 +87,25 @@ const getCityCoords = (city) => {
 // WMO weathercode → condition text + icon
 const weatherCodeToCondition = (code, isDay = 1) => {
   const conditions = {
-    0:  { text: 'Clear sky',         icon: isDay ? '☀️' : '🌙' },
-    1:  { text: 'Mainly clear',       icon: '🌤️' },
-    2:  { text: 'Partly cloudy',      icon: '⛅' },
-    3:  { text: 'Overcast',           icon: '☁️' },
-    45: { text: 'Foggy',              icon: '🌫️' },
-    48: { text: 'Icy fog',            icon: '🌫️' },
-    51: { text: 'Light drizzle',      icon: '🌦️' },
-    53: { text: 'Drizzle',            icon: '🌦️' },
-    55: { text: 'Heavy drizzle',      icon: '🌧️' },
-    61: { text: 'Light rain',         icon: '🌧️' },
-    63: { text: 'Moderate rain',      icon: '🌧️' },
-    65: { text: 'Heavy rain',         icon: '🌧️' },
-    71: { text: 'Light snow',         icon: '🌨️' },
-    73: { text: 'Moderate snow',      icon: '❄️' },
-    75: { text: 'Heavy snow',         icon: '❄️' },
-    80: { text: 'Light showers',      icon: '🌦️' },
-    81: { text: 'Moderate showers',   icon: '🌧️' },
-    82: { text: 'Violent showers',    icon: '⛈️' },
-    95: { text: 'Thunderstorm',       icon: '⛈️' },
+    0: { text: 'Clear sky', icon: isDay ? '☀️' : '🌙' },
+    1: { text: 'Mainly clear', icon: '🌤️' },
+    2: { text: 'Partly cloudy', icon: '⛅' },
+    3: { text: 'Overcast', icon: '☁️' },
+    45: { text: 'Foggy', icon: '🌫️' },
+    48: { text: 'Icy fog', icon: '🌫️' },
+    51: { text: 'Light drizzle', icon: '🌦️' },
+    53: { text: 'Drizzle', icon: '🌦️' },
+    55: { text: 'Heavy drizzle', icon: '🌧️' },
+    61: { text: 'Light rain', icon: '🌧️' },
+    63: { text: 'Moderate rain', icon: '🌧️' },
+    65: { text: 'Heavy rain', icon: '🌧️' },
+    71: { text: 'Light snow', icon: '🌨️' },
+    73: { text: 'Moderate snow', icon: '❄️' },
+    75: { text: 'Heavy snow', icon: '❄️' },
+    80: { text: 'Light showers', icon: '🌦️' },
+    81: { text: 'Moderate showers', icon: '🌧️' },
+    82: { text: 'Violent showers', icon: '⛈️' },
+    95: { text: 'Thunderstorm', icon: '⛈️' },
     96: { text: 'Thunderstorm w/ hail', icon: '⛈️' },
     99: { text: 'Heavy thunderstorm', icon: '⛈️' },
   };
@@ -138,15 +138,15 @@ export const fetchWeather = async (city = 'Dhaka') => {
     return {
       location: { name: coords.name, country: coords.country, lat: data.lat, lon: data.lon },
       current: {
-        temp_c:        data.current?.temperature ?? 30,
-        feelslike_c:   data.current?.temperature ?? 30,
-        wind_kph:      data.current?.windspeed ?? 0,
-        wind_dir:      data.current?.winddirection ?? 0,
-        humidity:      70,   // not in free-tier response
-        uv:            5,    // not in free-tier response
+        temp_c: data.current?.temperature ?? 30,
+        feelslike_c: data.current?.temperature ?? 30,
+        wind_kph: data.current?.windspeed ?? 0,
+        wind_dir: data.current?.winddirection ?? 0,
+        humidity: 70,   // not in free-tier response
+        uv: 5,    // not in free-tier response
         visibility_km: 10,   // not in free-tier response
         precipitation: data.daily?.[0]?.precipitation ?? 0,
-        is_day:        data.current?.is_day ?? 1,
+        is_day: data.current?.is_day ?? 1,
         condition: { text: condition.text, icon: condition.icon },
       },
       _raw: data,
@@ -183,9 +183,9 @@ export const fetchForecast = async (city = 'Dhaka') => {
       return {
         date: day.date,
         day: {
-          maxtemp_c:       day.temp_max,
-          mintemp_c:       day.temp_min,
-          totalprecip_mm:  day.precipitation,
+          maxtemp_c: day.temp_max,
+          mintemp_c: day.temp_min,
+          totalprecip_mm: day.precipitation,
           condition: { text: cond.text, icon: cond.icon },
         },
       };
@@ -206,19 +206,19 @@ export const fetchAiInsights = async (city = 'Dhaka') => {
   if (!API_KEY) {
     return new Promise((resolve) => setTimeout(() => resolve(MOCK_AI_INSIGHTS), 1200));
   }
-  
+
   const coords = getCityCoords(city);
   try {
     const res = await fetch(`${BASE_URL}/insights?lat=${coords.lat}&lon=${coords.lon}`, {
       headers: { 'Authorization': `Bearer ${API_KEY}` }
     });
-    
+
     // If PRO+ is required and user is on Free, or any error, fallback to mock
     if (!res.ok) {
       console.warn('Real AI Insights API failed or requires PRO+. Falling back to mock data.');
       return MOCK_AI_INSIGHTS;
     }
-    
+
     return await res.json();
   } catch (error) {
     return MOCK_AI_INSIGHTS;
@@ -263,10 +263,10 @@ export const fetchHourlyForecast = async (city = 'Dhaka') => {
     const data = await res.json();
     // Only return today's hours (next 24h)
     const todayHours = (data.hourly || []).slice(0, 24).map(h => ({
-      time:          h.time,
-      temp:          h.temp,
+      time: h.time,
+      temp: h.temp,
       precipitation: h.precipitation,
-      weathercode:   h.weathercode,
+      weathercode: h.weathercode,
     }));
     return { hourly: todayHours, city: coords.name };
   } catch {
@@ -323,14 +323,14 @@ export const fetch14DayForecast = async (city = 'Dhaka') => {
     const res = await fetch(`${BASE_URL}/forecast14?lat=${coords.lat}&lon=${coords.lon}`, {
       headers: { 'Authorization': `Bearer ${API_KEY}` }
     });
-    
+
     if (!res.ok) {
       console.warn('Real 14-Day Forecast API failed or requires PRO+. Falling back to mock data.');
       return MOCK_14_DAY;
     }
-    
+
     const data = await res.json();
-    
+
     // Normalize if the real backend gives `daily` instead of `forecast.forecastday`
     if (data.daily && !data.forecast) {
       return {
@@ -351,7 +351,7 @@ export const fetch14DayForecast = async (city = 'Dhaka') => {
         _raw: data
       };
     }
-    
+
     return data;
   } catch (error) {
     return MOCK_14_DAY;
@@ -363,17 +363,17 @@ export const ipLookup = async () => {
   if (!API_KEY) {
     return new Promise((resolve) => setTimeout(() => resolve({ city: "Dhaka", country: "Bangladesh" }), 300));
   }
-  
+
   try {
     const res = await fetch(`${BASE_URL}/ip-lookup`, {
       headers: { 'Authorization': `Bearer ${API_KEY}` }
     });
-    
+
     if (!res.ok) {
       console.warn('Real IP Lookup API failed or requires PRO+. Falling back to default.');
       return { city: "Dhaka", country: "Bangladesh" };
     }
-    
+
     return await res.json();
   } catch (error) {
     return { city: "Dhaka", country: "Bangladesh" };
@@ -392,11 +392,11 @@ export const fetchUsageStats = async () => {
     const data = await res.json();
     // Normalize to the shape the app expects
     return {
-      plan:            data.plan    || 'free',
-      requests_today:  data.used    ?? 0,
-      limit:           data.limit   ?? 1000,
-      remaining:       data.remaining ?? (data.limit - data.used),
-      unlimited:       data.unlimited ?? false,
+      plan: data.plan || 'free',
+      requests_today: data.used ?? 0,
+      limit: data.limit ?? 1000,
+      remaining: data.remaining ?? (data.limit - data.used),
+      unlimited: data.unlimited ?? false,
       active_webhooks: 0,
     };
   } catch {
@@ -472,62 +472,62 @@ export const analyzeForestry = async (lat = 23.8103, lon = 90.4125, cropType = '
     // Fetch current + daily from real API in parallel
     const [curRes, dayRes] = await Promise.all([
       fetch(`${BASE_URL}/current?lat=${lat}&lon=${lon}`, { headers: { 'Authorization': `Bearer ${API_KEY}` } }),
-      fetch(`${BASE_URL}/daily?lat=${lat}&lon=${lon}`,   { headers: { 'Authorization': `Bearer ${API_KEY}` } }),
+      fetch(`${BASE_URL}/daily?lat=${lat}&lon=${lon}`, { headers: { 'Authorization': `Bearer ${API_KEY}` } }),
     ]);
     const cur = curRes.ok ? await curRes.json() : null;
     const day = dayRes.ok ? await dayRes.json() : null;
 
     // ── Extract key metrics ──
-    const todayHours   = day?.hourly || [];
-    const totalPrecip  = todayHours.reduce((s, h) => s + (h.precipitation || 0), 0);  // mm today
-    const weathercode  = cur?.current?.weathercode ?? 0;
-    const windspeed    = cur?.current?.windspeed   ?? 0;
-    const isRainy      = [51,53,55,61,63,65,80,81,82,95,96,99].includes(weathercode);
-    const isStormy     = [95,96,99].includes(weathercode);
+    const todayHours = day?.hourly || [];
+    const totalPrecip = todayHours.reduce((s, h) => s + (h.precipitation || 0), 0);  // mm today
+    const weathercode = cur?.current?.weathercode ?? 0;
+    const windspeed = cur?.current?.windspeed ?? 0;
+    const isRainy = [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(weathercode);
+    const isStormy = [95, 96, 99].includes(weathercode);
 
     // ── Calculate scores ──
     // Drought risk: low if rain today, high if dry and windy
     let droughtScore = 0;
     if (totalPrecip === 0 && windspeed > 20) droughtScore = 80;
-    else if (totalPrecip < 1)                droughtScore = 55;
-    else if (totalPrecip < 5)                droughtScore = 25;
-    else                                     droughtScore = 5;
+    else if (totalPrecip < 1) droughtScore = 55;
+    else if (totalPrecip < 5) droughtScore = 25;
+    else droughtScore = 5;
 
     // Disease risk: fungal/bacterial grows with high moisture
     let diseaseScore = 0;
-    if (isRainy && totalPrecip > 10)         diseaseScore = 85;
-    else if (isRainy)                        diseaseScore = 55;
-    else if (totalPrecip > 5)                diseaseScore = 35;
-    else                                     diseaseScore = 15;
+    if (isRainy && totalPrecip > 10) diseaseScore = 85;
+    else if (isRainy) diseaseScore = 55;
+    else if (totalPrecip > 5) diseaseScore = 35;
+    else diseaseScore = 15;
 
     // Health score: penalise drought + disease + storm
-    const penalty     = (droughtScore * 0.4) + (diseaseScore * 0.3) + (isStormy ? 20 : 0);
+    const penalty = (droughtScore * 0.4) + (diseaseScore * 0.3) + (isStormy ? 20 : 0);
     const healthScore = Math.max(10, Math.min(100, Math.round(100 - penalty)));
 
-    const droughtLabel  = droughtScore >= 70 ? 'High' : droughtScore >= 40 ? 'Moderate' : 'Low';
-    const droughtColor  = droughtScore >= 70 ? '🔴' : droughtScore >= 40 ? '🟡' : '🟢';
-    const diseaseLabel  = diseaseScore >= 70 ? 'High' : diseaseScore >= 40 ? 'Moderate' : 'Low';
-    const diseaseColor  = diseaseScore >= 70 ? '🔴' : diseaseScore >= 40 ? '🟡' : '🟢';
+    const droughtLabel = droughtScore >= 70 ? 'High' : droughtScore >= 40 ? 'Moderate' : 'Low';
+    const droughtColor = droughtScore >= 70 ? '🔴' : droughtScore >= 40 ? '🟡' : '🟢';
+    const diseaseLabel = diseaseScore >= 70 ? 'High' : diseaseScore >= 40 ? 'Moderate' : 'Low';
+    const diseaseColor = diseaseScore >= 70 ? '🔴' : diseaseScore >= 40 ? '🟡' : '🟢';
 
     // AI recommendation based on conditions
     let recommendation;
-    if (isStormy)          recommendation = 'Severe weather detected. Postpone all field operations. Secure equipment and ensure drainage channels are clear.';
+    if (isStormy) recommendation = 'Severe weather detected. Postpone all field operations. Secure equipment and ensure drainage channels are clear.';
     else if (droughtScore >= 70) recommendation = `Drought risk is HIGH. Initiate emergency irrigation for ${cropType} crops. Water at dawn to reduce evaporation.`;
     else if (diseaseScore >= 70) recommendation = `High fungal risk due to ${totalPrecip.toFixed(1)}mm rainfall today. Apply fungicide treatment and improve field drainage.`;
     else if (diseaseScore >= 40) recommendation = `Moderate moisture detected (${totalPrecip.toFixed(1)}mm). Monitor for early signs of fungal disease. Maintain standard irrigation.`;
-    else                         recommendation = `Conditions are optimal. Current precipitation: ${totalPrecip.toFixed(1)}mm. Continue standard care schedule for ${cropType}.`;
+    else recommendation = `Conditions are optimal. Current precipitation: ${totalPrecip.toFixed(1)}mm. Continue standard care schedule for ${cropType}.`;
 
     return {
-      health_score:   healthScore,
-      drought_risk:   `${droughtColor} ${droughtLabel}`,
-      disease_risk:   `${diseaseColor} ${diseaseLabel} — ${totalPrecip.toFixed(1)}mm today`,
+      health_score: healthScore,
+      drought_risk: `${droughtColor} ${droughtLabel}`,
+      disease_risk: `${diseaseColor} ${diseaseLabel} — ${totalPrecip.toFixed(1)}mm today`,
       recommendation,
       // extra data for UI
       precipitation_today: totalPrecip.toFixed(1),
-      wind_kph:            windspeed,
+      wind_kph: windspeed,
       weathercode,
-      is_stormy:           isStormy,
-      is_rainy:            isRainy,
+      is_stormy: isStormy,
+      is_rainy: isRainy,
     };
   } catch {
     return MOCK_FORESTRY_ANALYSIS;
@@ -536,7 +536,27 @@ export const analyzeForestry = async (lat = 23.8103, lon = 90.4125, cropType = '
 
 // --- REAL BACKEND INTEGRATION ---
 
-const BACKEND_URL = 'http://localhost:5000/api/v1';
+const BACKEND_URL = 'https://subscription-billing-api-rho.vercel.app/api/v1';
+
+const getFriendlyErrorMessage = (errorMsg) => {
+  if (!errorMsg) return "An unexpected error occurred. Please try again.";
+  const msg = errorMsg.toLowerCase();
+  
+  if (msg.includes('buffering timed out') || msg.includes('failed to fetch') || msg.includes('network error') || msg.includes('timeout')) {
+    return "We're having trouble connecting to our servers right now. Please try again in a few moments.";
+  }
+  if (msg.includes('e11000') || msg.includes('duplicate')) {
+    return "An account with this email already exists. Please try logging in instead.";
+  }
+  if (msg.includes('validation failed')) {
+    return "Please double-check the information you entered and try again.";
+  }
+  if (msg.includes('mongo') || msg.includes('operation') || msg.includes('cast to') || msg.includes('internal server')) {
+    return "Something went wrong on our end. Please try again later.";
+  }
+  
+  return errorMsg; // Return original if it doesn't match known technical jargon
+};
 
 export const loginUser = async (email, password) => {
   try {
@@ -549,10 +569,7 @@ export const loginUser = async (email, password) => {
     if (!res.ok) throw new Error(data.message || 'Login failed');
     return data;
   } catch (error) {
-    if (error.message.includes('Failed to fetch')) {
-      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running on port 5000.");
-    }
-    throw error;
+    throw new Error(getFriendlyErrorMessage(error.message));
   }
 };
 
@@ -567,10 +584,7 @@ export const registerUser = async (name, email, password) => {
     if (!res.ok) throw new Error(data.message || 'Registration failed');
     return data;
   } catch (error) {
-    if (error.message.includes('Failed to fetch')) {
-      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running on port 5000.");
-    }
-    throw error;
+    throw new Error(getFriendlyErrorMessage(error.message));
   }
 };
 
@@ -579,7 +593,7 @@ export const fetchPlans = async () => {
     const res = await fetch(`${BACKEND_URL}/plans`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to fetch plans');
-    // Handle both direct array and wrapped { data: [...] }, { plans: [...] }, or { value: [...] } formats
+    
     if (Array.isArray(data)) return data;
     if (Array.isArray(data.data)) return data.data;
     if (Array.isArray(data.plans)) return data.plans;
@@ -595,7 +609,7 @@ export const subscribeToPlan = async (planId, token) => {
   try {
     const res = await fetch(`${BACKEND_URL}/subscriptions/purchase`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
@@ -605,15 +619,12 @@ export const subscribeToPlan = async (planId, token) => {
     if (res.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      throw new Error('Session expired. Please sign out and log in again.');
+      throw new Error('Your session has expired. Please sign out and log in again.');
     }
     if (!res.ok) throw new Error(data.message || 'Subscription failed');
     return data;
   } catch (error) {
-    if (error.message.includes('Failed to fetch')) {
-      throw new Error("Backend server is unreachable. Please make sure MongoDB and the backend are running.");
-    }
-    throw error;
+    throw new Error(getFriendlyErrorMessage(error.message));
   }
 };
 
@@ -641,7 +652,7 @@ export const cancelSubscription = async (subscriptionId, token) => {
     if (!res.ok) throw new Error(data.message || 'Failed to cancel subscription');
     return data;
   } catch (error) {
-    throw error;
+    throw new Error(getFriendlyErrorMessage(error.message));
   }
 };
 

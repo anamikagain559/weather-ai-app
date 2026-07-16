@@ -13,7 +13,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="w-full sticky top-0 z-[9999] bg-ink/90 backdrop-blur-2xl border-b border-borderTint py-4 transition-all animate-fade-in">
+      <header className="w-full sticky top-0 z-50 bg-ink/90 backdrop-blur-2xl border-b border-borderTint py-4 transition-all animate-fade-in">
         <div className="max-w-[1400px] mx-auto px-6 md:px-16 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 no-underline">
@@ -61,7 +61,7 @@ const Header = () => {
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-4 bg-panel border border-borderTint rounded-xl shadow-2xl animate-fade-in min-w-[280px] z-[99999] overflow-hidden">
+                  <div className="absolute right-0 mt-4 bg-panel border border-borderTint rounded-xl shadow-2xl animate-fade-in min-w-[280px] z-50 overflow-hidden">
                     <div className="p-5 border-b border-borderTint bg-surface">
                       <p className="text-whiteBright text-base font-bold m-0 truncate">{user.name}</p>
                       <p className="text-muted text-xs mt-1 truncate">{user.email}</p>
