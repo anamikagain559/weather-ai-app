@@ -9,16 +9,26 @@
     <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
     <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
   </p>
+
+  <h3>
+    🌐 Live Demo: <a href="https://weather-ai-app-eta.vercel.app/">https://weather-ai-app-eta.vercel.app/</a>
+  </h3>
+  <p>
+    <em>Backend API: <a href="https://subscription-billing-api-rho.vercel.app">https://subscription-billing-api-rho.vercel.app</a></em>
+  </p>
 </div>
 
 <hr/>
 
-## ✨ Features
-- 🌡️ **Current Weather Intelligence:** Real-time temperature, wind speed, humidity, and UV index.
-- 📅 **5-Day Forecast:** Predictive weather insights for the upcoming days.
+## ✨ Core Features
+
+- 🌡️ **Comprehensive Weather Intelligence:** Get real-time updates on temperature, wind speed, humidity, and UV index with beautiful, intuitive icons.
+- 📅 **Interactive Forecasts:** Plan ahead with detailed 5-day predictive weather insights, complete with daily highs and lows.
+- 🌳 **Forestry AI Analysis:** A specialized module that calculates health scores, drought risk, and disease risk for forestry and agriculture based on current weather conditions.
+- 📱 **SMS Alert System:** Stay notified of severe weather events with an integrated SMS alert notification feature.
+- 💳 **Subscription & Billing:** Premium tiered access powered by Stripe. Users can upgrade their plan to access advanced AI insights and extended forecasts.
 - 💎 **Premium Glassmorphism UI:** Built with Tailwind CSS, leveraging modern design principles, vibrant gradients, and smooth micro-animations.
-- 📱 **Responsive Design:** A flawless and fluid experience across desktop, tablet, and mobile devices.
-- 🎭 **Smart Fallback Mechanism:** Gracefully falls back to mock data if the API key is missing to demonstrate full UI functionality.
+- 🎭 **Smart Fallback Mechanism:** Gracefully falls back to realistic mock data if the API key is missing or backend is unavailable, demonstrating full UI functionality seamlessly.
 
 ---
 
@@ -28,6 +38,8 @@
 | **Frontend Framework** | React 18 |
 | **Build Tool** | Vite |
 | **Styling** | Tailwind CSS (Glassmorphism Aesthetic) |
+| **Routing** | React Router DOM |
+| **Notifications** | SweetAlert2 & React Hot Toast |
 | **Data Source** | Weather-AI API |
 
 ---
@@ -42,7 +54,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone <https://github.com/anamikagain559/weather-ai-app.git>
+   git clone https://github.com/anamikagain559/weather-ai-app.git
    cd weather-ai-app
    ```
 
@@ -70,11 +82,10 @@
 
 This project is highly optimized for deployment on platforms like Vercel, Netlify, or Render.
 
-**Deploying on Vercel / Netlify:**
+**Deploying on Vercel:**
 1. Connect your GitHub repository to your hosting provider.
-2. Set the **Build Command** to `npm run build`.
-3. Set the **Publish Directory** to `dist`.
-4. Don't forget to add the `VITE_WEATHER_AI_API_KEY` to the Environment Variables section in your deployment dashboard!
+2. The `vercel.json` file is already included to handle React Router client-side routing.
+3. Don't forget to add the `VITE_WEATHER_AI_API_KEY` to the Environment Variables section in your deployment dashboard!
 
 ---
 

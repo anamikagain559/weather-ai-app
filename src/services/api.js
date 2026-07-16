@@ -541,7 +541,7 @@ const BACKEND_URL = 'https://subscription-billing-api-rho.vercel.app/api/v1';
 const getFriendlyErrorMessage = (errorMsg) => {
   if (!errorMsg) return "An unexpected error occurred. Please try again.";
   const msg = errorMsg.toLowerCase();
-  
+
   if (msg.includes('buffering timed out') || msg.includes('failed to fetch') || msg.includes('network error') || msg.includes('timeout')) {
     return "We're having trouble connecting to our servers right now. Please try again in a few moments.";
   }
@@ -554,7 +554,7 @@ const getFriendlyErrorMessage = (errorMsg) => {
   if (msg.includes('mongo') || msg.includes('operation') || msg.includes('cast to') || msg.includes('internal server')) {
     return "Something went wrong on our end. Please try again later.";
   }
-  
+
   return errorMsg; // Return original if it doesn't match known technical jargon
 };
 
@@ -593,7 +593,7 @@ export const fetchPlans = async () => {
     const res = await fetch(`${BACKEND_URL}/plans`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to fetch plans');
-    
+
     if (Array.isArray(data)) return data;
     if (Array.isArray(data.data)) return data.data;
     if (Array.isArray(data.plans)) return data.plans;
