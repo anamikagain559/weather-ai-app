@@ -12,13 +12,30 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Validate token is a real JWT (3 parts separated by dots), not "dummy_token"
     const isValidJwt = (t) => t && t.split('.').length === 3;
+
+    // Check if JWT is expired by decoding the payload
+    const isJwtExpired = (t) => {
+      try {
+        const payload = JSON.parse(atob(t.split('.')[1]));
+        return payload.exp && Date.now() / 1000 > payload.exp;
+      } catch {
+        return true; // treat as expired if decode fails
+      }
+    };
     
     if (token && isValidJwt(token)) {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser) setUser(storedUser);
-      } catch (e) {
-        console.error("Failed to parse stored user", e);
+      if (isJwtExpired(token)) {
+        // Token expired — clear everything
+        setToken(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } else {
+        try {
+          const storedUser = JSON.parse(localStorage.getItem('user'));
+          if (storedUser) setUser(storedUser);
+        } catch (e) {
+          console.error("Failed to parse stored user", e);
+        }
       }
     } else if (token) {
       // Invalid token format — clear it

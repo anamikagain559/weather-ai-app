@@ -241,7 +241,12 @@ export const fetchPlans = async () => {
     const res = await fetch(`${BACKEND_URL}/plans`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to fetch plans');
-    return data;
+    // Handle both direct array and wrapped { data: [...] }, { plans: [...] }, or { value: [...] } formats
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.data)) return data.data;
+    if (Array.isArray(data.plans)) return data.plans;
+    if (Array.isArray(data.value)) return data.value;
+    return [];
   } catch (error) {
     console.error("Fetch Plans Error:", error);
     return [];
@@ -250,7 +255,7 @@ export const fetchPlans = async () => {
 
 export const subscribeToPlan = async (planId, token) => {
   try {
-    const res = await fetch(`${BACKEND_URL}/subscriptions`, {
+    const res = await fetch(`${BACKEND_URL}/subscriptions/purchase`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -260,7 +265,6 @@ export const subscribeToPlan = async (planId, token) => {
     });
     const data = await res.json();
     if (res.status === 401) {
-      // Token is invalid/expired — clear it so user is forced to login again
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       throw new Error('Session expired. Please sign out and log in again.');

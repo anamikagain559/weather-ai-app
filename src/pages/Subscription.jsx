@@ -21,7 +21,7 @@ export default function Subscription() {
   const [plans, setPlans] = useState([]);
   const [loadingPlanId, setLoadingPlanId] = useState(null);
 
-  const { user, token } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,11 +33,15 @@ export default function Subscription() {
       navigate('/login');
       return;
     }
-    const targetPlanName = `${planName} ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}`;
-    const plan = plans.find(p => p.name === targetPlanName);
+    
+    // Try multiple name formats to find the plan
+    const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const targetPlanName = `${planName} ${capitalize(billingCycle)}`;
+    
+    const plan = plans.find(p => p.name.toLowerCase() === targetPlanName.toLowerCase());
 
     if (!plan) {
-      toast.error('Plan not found. Please refresh and try again.', { style: { background: '#1e1e3a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+      toast.error(`Plan "${targetPlanName}" not found. Please refresh the page.`, { style: { background: '#1e1e3a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
       return;
     }
 
@@ -51,7 +55,15 @@ export default function Subscription() {
       }
     } catch (err) {
       toast.dismiss(toastId);
-      toast.error(err.message || 'Failed to initiate checkout', { style: { background: '#1e1e3a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+      // Handle JWT expired / 401 — logout and redirect to login
+      const msg = err.message || '';
+      if (msg.toLowerCase().includes('jwt') || msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('session')) {
+        logout();
+        toast.error('Your session has expired. Please log in again.', { style: { background: '#1e1e3a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+        navigate('/login');
+        return;
+      }
+      toast.error(msg || 'Failed to initiate checkout', { style: { background: '#1e1e3a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
     } finally {
       setLoadingPlanId(null);
     }

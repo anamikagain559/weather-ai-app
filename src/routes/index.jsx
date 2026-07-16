@@ -7,6 +7,8 @@ import Subscription from '../pages/Subscription';
 import Developer from '../pages/Developer';
 import SmsDashboard from '../pages/SmsDashboard';
 import Forestry from '../pages/Forestry';
+import PaymentSuccess from '../pages/PaymentSuccess';
+import PaymentCancel from '../pages/PaymentCancel';
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +42,14 @@ export const router = createBrowserRouter([
       {
         path: '/forestry',
         element: <Forestry />,
+      },
+      {
+        path: '/success',
+        element: <PaymentSuccess />,
+      },
+      {
+        path: '/cancel',
+        element: <PaymentCancel />,
       },
     ],
   },
