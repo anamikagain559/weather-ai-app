@@ -51,23 +51,43 @@ const Header = () => {
                 </button>
                 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 glass-panel border border-white/10 rounded-xl overflow-hidden flex flex-col fade-in" style={{ zIndex: 100, padding: '8px' }}>
-                    <div className="px-3 py-2 border-b border-white/10 mb-2">
-                      <p className="text-sm font-bold truncate">{user.name}</p>
-                      <p className="text-xs text-muted truncate">{user.email}</p>
-                      <span className="text-[10px] uppercase bg-warning-color/20 text-warning-color px-2 py-0.5 rounded-full mt-1 inline-block border border-warning-color/20">{user.role}</span>
+                  <div className="absolute right-0 mt-3 w-56 glass-panel border border-white/20 rounded-2xl overflow-hidden flex flex-col fade-in shadow-2xl shadow-black/80" style={{ zIndex: 100 }}>
+                    <div className="px-4 py-4 border-b border-white/10 bg-black/20">
+                      <p className="text-[15px] font-bold text-white truncate">{user.name}</p>
+                      <p className="text-[12px] text-muted truncate mt-0.5">{user.email}</p>
+                      <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-accent-color/30 bg-accent-color/10">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-color)', boxShadow: '0 0 5px var(--accent-color)' }}></span>
+                        <span className="text-[10px] uppercase font-bold text-accent-color tracking-wider">{user.role}</span>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => { setProfileOpen(false); logout(); navigate('/'); }}
-                      className="text-left px-3 py-2 text-sm text-danger-color hover:bg-danger-color/10 rounded transition-colors"
-                    >
-                      Sign Out
-                    </button>
+                    
+                    <div className="p-2 space-y-1">
+                      <Link 
+                        to="/profile" 
+                        onClick={() => setProfileOpen(false)}
+                        className="group flex items-center gap-3 text-left px-3 py-2.5 text-[13px] font-semibold text-slate-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <div className="text-white/60 group-hover:text-white transition-colors">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        Profile Settings
+                      </Link>
+                      
+                      <button 
+                        onClick={() => { setProfileOpen(false); logout(); navigate('/'); }}
+                        className="group flex items-center gap-3 w-full text-left px-3 py-2.5 text-[13px] font-semibold text-danger-color hover:text-white hover:bg-danger-color/20 rounded-xl transition-all"
+                      >
+                        <div className="opacity-80 group-hover:opacity-100 transition-opacity">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                        </div>
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link to="/login" className="btn-primary" style={{ padding: '8px 20px', fontSize: '0.875rem' }}>Sign In</Link>
+              <Link to="/login" className="bg-sky-500 hover:bg-sky-400 text-white font-bold transition-all px-5 py-2.5 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)] hover:-translate-y-0.5 text-sm">Sign In</Link>
             )}
           </nav>
 
@@ -102,21 +122,36 @@ const Header = () => {
           
           {user ? (
             <div className="mobile-nav-link flex flex-col gap-2 border-t border-white/10 pt-4 mt-2">
-              <div className="flex items-center gap-2">
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+              <div className="flex items-center gap-3 bg-black/20 p-3.5 rounded-2xl border border-white/10">
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', fontWeight: 'bold', color: 'white', boxShadow: '0 4px 10px rgba(0,0,0,0.3)' }}>
                   {user.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <div className="font-bold">{user.name}</div>
-                  <div className="text-xs text-muted">{user.email}</div>
+                <div className="overflow-hidden">
+                  <div className="font-bold text-white text-[15px] truncate">{user.name}</div>
+                  <div className="text-[12px] text-muted truncate mt-0.5">{user.email}</div>
                 </div>
               </div>
-              <button 
-                onClick={() => { setMobileMenuOpen(false); logout(); navigate('/'); }}
-                className="w-full text-left py-2 text-danger-color font-bold mt-2"
-              >
-                Sign Out
-              </button>
+              <div className="flex flex-col gap-2 mt-3">
+                <Link 
+                  to="/profile" 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="group flex items-center gap-3 py-2.5 px-4 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white font-semibold rounded-xl transition-all text-sm border border-transparent hover:border-white/10"
+                >
+                  <div className="text-white/60 group-hover:text-white transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  </div>
+                  Profile Settings
+                </Link>
+                <button 
+                  onClick={() => { setMobileMenuOpen(false); logout(); navigate('/'); }}
+                  className="group flex items-center gap-3 py-2.5 px-4 bg-danger-color/5 hover:bg-danger-color/20 text-danger-color hover:text-white font-semibold rounded-xl transition-all text-sm text-left border border-transparent hover:border-danger-color/30"
+                >
+                  <div className="opacity-80 group-hover:opacity-100 transition-opacity">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                  </div>
+                  Sign Out
+                </button>
+              </div>
             </div>
           ) : (
             <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link border-t border-white/10 pt-4 mt-2" style={{fontWeight: 700, color: 'var(--accent-color)'}}>Sign In</Link>

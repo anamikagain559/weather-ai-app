@@ -8,7 +8,10 @@ export default function Forestry() {
   const handleAnalyze = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = await analyzeForestry();
+    const lat = e.target.elements[0].value;
+    const lon = e.target.elements[1].value;
+    const crop = e.target.elements[2].value;
+    const data = await analyzeForestry(lat, lon, crop);
     setAnalysis(data);
     setLoading(false);
   };
@@ -58,6 +61,18 @@ export default function Forestry() {
             </div>
             
             <div className="space-y-4">
+              {/* Extra data we are now returning */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                  <p className="text-xs opacity-60 mb-1 uppercase tracking-wider">Today's Rain</p>
+                  <p className="font-bold text-xl text-[#38bdf8]">{analysis.precipitation_today}mm</p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl border border-white/5">
+                  <p className="text-xs opacity-60 mb-1 uppercase tracking-wider">Wind Speed</p>
+                  <p className="font-bold text-xl text-white">{analysis.wind_kph} <span className="text-sm font-normal opacity-60">kph</span></p>
+                </div>
+              </div>
+
               <div className="bg-white/5 p-4 rounded-xl">
                 <p className="text-sm opacity-70 mb-1">Drought Risk</p>
                 <p className="font-bold text-lg text-success-color">{analysis.drought_risk}</p>

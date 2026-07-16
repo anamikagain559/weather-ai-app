@@ -3,6 +3,7 @@
 const API_KEY = import.meta.env.VITE_WEATHER_AI_API_KEY;
 const BASE_URL = 'https://api.weather-ai.co/v1';
 
+
 const MOCK_USAGE = { requests_today: 450, limit: 1000, active_webhooks: 2 };
 const MOCK_WEBHOOKS = [
   { id: "wh_123", url: "https://myapp.com/api/webhook/weather", events: ["weather.alert", "temp.high"], status: "active" }
@@ -66,34 +67,100 @@ const MOCK_ALERTS = {
   ]
 };
 
+// City name → lat/lon lookup (common cities)
+const CITY_COORDS = {
+  dhaka:      { lat: 23.8103, lon: 90.4125, name: 'Dhaka',      country: 'Bangladesh' },
+  chittagong: { lat: 22.3569, lon: 91.7832, name: 'Chittagong', country: 'Bangladesh' },
+  sylhet:     { lat: 24.8949, lon: 91.8687, name: 'Sylhet',     country: 'Bangladesh' },
+  khulna:     { lat: 22.8456, lon: 89.5403, name: 'Khulna',     country: 'Bangladesh' },
+  rajshahi:   { lat: 24.3745, lon: 88.6042, name: 'Rajshahi',   country: 'Bangladesh' },
+  london:     { lat: 51.5074, lon: -0.1278, name: 'London',     country: 'UK' },
+  'new york': { lat: 40.7128, lon: -74.0060, name: 'New York',  country: 'US' },
+  dubai:      { lat: 25.2048, lon: 55.2708, name: 'Dubai',      country: 'UAE' },
+};
+
+const getCityCoords = (city) => {
+  const key = city.toLowerCase().trim();
+  return CITY_COORDS[key] || CITY_COORDS['dhaka'];
+};
+
+// WMO weathercode → condition text + icon
+const weatherCodeToCondition = (code, isDay = 1) => {
+  const conditions = {
+    0:  { text: 'Clear sky',         icon: isDay ? '☀️' : '🌙' },
+    1:  { text: 'Mainly clear',       icon: '🌤️' },
+    2:  { text: 'Partly cloudy',      icon: '⛅' },
+    3:  { text: 'Overcast',           icon: '☁️' },
+    45: { text: 'Foggy',              icon: '🌫️' },
+    48: { text: 'Icy fog',            icon: '🌫️' },
+    51: { text: 'Light drizzle',      icon: '🌦️' },
+    53: { text: 'Drizzle',            icon: '🌦️' },
+    55: { text: 'Heavy drizzle',      icon: '🌧️' },
+    61: { text: 'Light rain',         icon: '🌧️' },
+    63: { text: 'Moderate rain',      icon: '🌧️' },
+    65: { text: 'Heavy rain',         icon: '🌧️' },
+    71: { text: 'Light snow',         icon: '🌨️' },
+    73: { text: 'Moderate snow',      icon: '❄️' },
+    75: { text: 'Heavy snow',         icon: '❄️' },
+    80: { text: 'Light showers',      icon: '🌦️' },
+    81: { text: 'Moderate showers',   icon: '🌧️' },
+    82: { text: 'Violent showers',    icon: '⛈️' },
+    95: { text: 'Thunderstorm',       icon: '⛈️' },
+    96: { text: 'Thunderstorm w/ hail', icon: '⛈️' },
+    99: { text: 'Heavy thunderstorm', icon: '⛈️' },
+  };
+  return conditions[code] || { text: 'Partly cloudy', icon: '⛅' };
+};
+
+
 /**
  * Fetches current weather for a given city.
+ * Uses lat/lon as required by weather-ai.co API.
  */
 export const fetchWeather = async (city = 'Dhaka') => {
-  // If no API key is provided, simulate a network request and return mock data
   if (!API_KEY) {
-    console.warn("No VITE_WEATHER_AI_API_KEY found. Using Mock Data.");
+    console.warn('No VITE_WEATHER_AI_API_KEY found. Using Mock Data.');
     return new Promise((resolve) => {
       setTimeout(() => resolve({ ...MOCK_CURRENT, location: { ...MOCK_CURRENT.location, name: city } }), 800);
     });
   }
 
+  const coords = getCityCoords(city);
   try {
-    const res = await fetch(`${BASE_URL}/current?q=${city}`, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
-      }
+    const res = await fetch(`${BASE_URL}/current?lat=${coords.lat}&lon=${coords.lon}`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
     });
-    if (!res.ok) throw new Error("Failed to fetch weather data");
-    return await res.json();
+    if (!res.ok) throw new Error('Failed to fetch weather data. Please try again.');
+    const data = await res.json();
+
+    // Normalize real API response → app's expected shape
+    const condition = weatherCodeToCondition(data.current?.weathercode, data.current?.is_day);
+    return {
+      location: { name: coords.name, country: coords.country, lat: data.lat, lon: data.lon },
+      current: {
+        temp_c:        data.current?.temperature ?? 30,
+        feelslike_c:   data.current?.temperature ?? 30,
+        wind_kph:      data.current?.windspeed ?? 0,
+        wind_dir:      data.current?.winddirection ?? 0,
+        humidity:      70,   // not in free-tier response
+        uv:            5,    // not in free-tier response
+        visibility_km: 10,   // not in free-tier response
+        precipitation: data.daily?.[0]?.precipitation ?? 0,
+        is_day:        data.current?.is_day ?? 1,
+        condition: { text: condition.text, icon: condition.icon },
+      },
+      _raw: data,
+    };
   } catch (error) {
-    console.error("API Error:", error);
+    console.error('API Error:', error);
     throw error;
   }
 };
 
+
 /**
  * Fetches 5-day forecast for a given city.
+ * Normalizes the real API daily array into the app's forecastday shape.
  */
 export const fetchForecast = async (city = 'Dhaka') => {
   if (!API_KEY) {
@@ -102,19 +169,35 @@ export const fetchForecast = async (city = 'Dhaka') => {
     });
   }
 
+  const coords = getCityCoords(city);
   try {
-    const res = await fetch(`${BASE_URL}/forecast?q=${city}&days=5`, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
-      }
+    const res = await fetch(`${BASE_URL}/forecast?lat=${coords.lat}&lon=${coords.lon}&days=5`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
     });
-    if (!res.ok) throw new Error("Failed to fetch forecast data");
-    return await res.json();
+    if (!res.ok) throw new Error('Failed to fetch forecast data. Please try again.');
+    const data = await res.json();
+
+    // Normalize real daily array → app's forecastday shape
+    const forecastday = (data.daily || []).map((day) => {
+      const cond = weatherCodeToCondition(day.weathercode);
+      return {
+        date: day.date,
+        day: {
+          maxtemp_c:       day.temp_max,
+          mintemp_c:       day.temp_min,
+          totalprecip_mm:  day.precipitation,
+          condition: { text: cond.text, icon: cond.icon },
+        },
+      };
+    });
+
+    return { forecast: { forecastday }, _raw: data };
   } catch (error) {
-    console.error("API Error:", error);
+    console.error('API Error:', error);
     throw error;
   }
 };
+
 
 /**
  * Premium API: Fetches AI generated weather insights.
@@ -157,20 +240,76 @@ export const fetchAqi = async (city = 'Dhaka') => {
 // --- NEW API INTEGRATIONS ---
 
 export const fetchHourlyForecast = async (city = 'Dhaka') => {
-  return new Promise((resolve) => setTimeout(() => resolve({ /* mock hourly */ }), 500));
+  if (!API_KEY) return Promise.resolve({ hourly: [] });
+  const coords = getCityCoords(city);
+  try {
+    const res = await fetch(`${BASE_URL}/hourly?lat=${coords.lat}&lon=${coords.lon}`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    if (!res.ok) return { hourly: [] };
+    const data = await res.json();
+    // Only return today's hours (next 24h)
+    const todayHours = (data.hourly || []).slice(0, 24).map(h => ({
+      time:          h.time,
+      temp:          h.temp,
+      precipitation: h.precipitation,
+      weathercode:   h.weathercode,
+    }));
+    return { hourly: todayHours, city: coords.name };
+  } catch {
+    return { hourly: [] };
+  }
 };
 
 export const fetchDailyForecast = async (city = 'Dhaka') => {
-  return new Promise((resolve) => setTimeout(() => resolve({ /* mock daily */ }), 500));
+  if (!API_KEY) return Promise.resolve({ daily: [] });
+  const coords = getCityCoords(city);
+  try {
+    const res = await fetch(`${BASE_URL}/daily?lat=${coords.lat}&lon=${coords.lon}`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    if (!res.ok) return { daily: [] };
+    const data = await res.json();
+    const daily = (data.daily || data.hourly || []).filter((h, i, arr) => {
+      // de-dup by date prefix
+      const day = h.time?.slice(0, 10);
+      return arr.findIndex(x => x.time?.slice(0, 10) === day) === i;
+    }).slice(0, 7);
+    return { daily, city: coords.name };
+  } catch {
+    return { daily: [] };
+  }
 };
+
 
 export const ipLookup = async () => {
   return new Promise((resolve) => setTimeout(() => resolve({ city: "Dhaka", country: "Bangladesh" }), 300));
 };
 
 export const fetchUsageStats = async () => {
-  return new Promise((resolve) => setTimeout(() => resolve(MOCK_USAGE), 600));
+  if (!API_KEY) {
+    return new Promise((resolve) => setTimeout(() => resolve(MOCK_USAGE), 600));
+  }
+  try {
+    const res = await fetch(`${BASE_URL}/usage`, {
+      headers: { 'Authorization': `Bearer ${API_KEY}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch usage');
+    const data = await res.json();
+    // Normalize to the shape the app expects
+    return {
+      plan:            data.plan    || 'free',
+      requests_today:  data.used    ?? 0,
+      limit:           data.limit   ?? 1000,
+      remaining:       data.remaining ?? (data.limit - data.used),
+      unlimited:       data.unlimited ?? false,
+      active_webhooks: 0,
+    };
+  } catch {
+    return MOCK_USAGE;
+  }
 };
+
 
 export const fetchWebhooks = async () => {
   return new Promise((resolve) => setTimeout(() => resolve(MOCK_WEBHOOKS), 700));
@@ -192,8 +331,74 @@ export const sendSmsAlert = async (phone, message) => {
   return new Promise((resolve) => setTimeout(() => resolve({ success: true, messageId: "msg_456" }), 1000));
 };
 
-export const analyzeForestry = async (lat, lon) => {
-  return new Promise((resolve) => setTimeout(() => resolve(MOCK_FORESTRY_ANALYSIS), 1500));
+export const analyzeForestry = async (lat = 23.8103, lon = 90.4125, cropType = 'general') => {
+  if (!API_KEY) {
+    return new Promise((resolve) => setTimeout(() => resolve(MOCK_FORESTRY_ANALYSIS), 1500));
+  }
+  try {
+    // Fetch current + daily from real API in parallel
+    const [curRes, dayRes] = await Promise.all([
+      fetch(`${BASE_URL}/current?lat=${lat}&lon=${lon}`, { headers: { 'Authorization': `Bearer ${API_KEY}` } }),
+      fetch(`${BASE_URL}/daily?lat=${lat}&lon=${lon}`,   { headers: { 'Authorization': `Bearer ${API_KEY}` } }),
+    ]);
+    const cur = curRes.ok ? await curRes.json() : null;
+    const day = dayRes.ok ? await dayRes.json() : null;
+
+    // ── Extract key metrics ──
+    const todayHours   = day?.hourly || [];
+    const totalPrecip  = todayHours.reduce((s, h) => s + (h.precipitation || 0), 0);  // mm today
+    const weathercode  = cur?.current?.weathercode ?? 0;
+    const windspeed    = cur?.current?.windspeed   ?? 0;
+    const isRainy      = [51,53,55,61,63,65,80,81,82,95,96,99].includes(weathercode);
+    const isStormy     = [95,96,99].includes(weathercode);
+
+    // ── Calculate scores ──
+    // Drought risk: low if rain today, high if dry and windy
+    let droughtScore = 0;
+    if (totalPrecip === 0 && windspeed > 20) droughtScore = 80;
+    else if (totalPrecip < 1)                droughtScore = 55;
+    else if (totalPrecip < 5)                droughtScore = 25;
+    else                                     droughtScore = 5;
+
+    // Disease risk: fungal/bacterial grows with high moisture
+    let diseaseScore = 0;
+    if (isRainy && totalPrecip > 10)         diseaseScore = 85;
+    else if (isRainy)                        diseaseScore = 55;
+    else if (totalPrecip > 5)                diseaseScore = 35;
+    else                                     diseaseScore = 15;
+
+    // Health score: penalise drought + disease + storm
+    const penalty     = (droughtScore * 0.4) + (diseaseScore * 0.3) + (isStormy ? 20 : 0);
+    const healthScore = Math.max(10, Math.min(100, Math.round(100 - penalty)));
+
+    const droughtLabel  = droughtScore >= 70 ? 'High' : droughtScore >= 40 ? 'Moderate' : 'Low';
+    const droughtColor  = droughtScore >= 70 ? '🔴' : droughtScore >= 40 ? '🟡' : '🟢';
+    const diseaseLabel  = diseaseScore >= 70 ? 'High' : diseaseScore >= 40 ? 'Moderate' : 'Low';
+    const diseaseColor  = diseaseScore >= 70 ? '🔴' : diseaseScore >= 40 ? '🟡' : '🟢';
+
+    // AI recommendation based on conditions
+    let recommendation;
+    if (isStormy)          recommendation = 'Severe weather detected. Postpone all field operations. Secure equipment and ensure drainage channels are clear.';
+    else if (droughtScore >= 70) recommendation = `Drought risk is HIGH. Initiate emergency irrigation for ${cropType} crops. Water at dawn to reduce evaporation.`;
+    else if (diseaseScore >= 70) recommendation = `High fungal risk due to ${totalPrecip.toFixed(1)}mm rainfall today. Apply fungicide treatment and improve field drainage.`;
+    else if (diseaseScore >= 40) recommendation = `Moderate moisture detected (${totalPrecip.toFixed(1)}mm). Monitor for early signs of fungal disease. Maintain standard irrigation.`;
+    else                         recommendation = `Conditions are optimal. Current precipitation: ${totalPrecip.toFixed(1)}mm. Continue standard care schedule for ${cropType}.`;
+
+    return {
+      health_score:   healthScore,
+      drought_risk:   `${droughtColor} ${droughtLabel}`,
+      disease_risk:   `${diseaseColor} ${diseaseLabel} — ${totalPrecip.toFixed(1)}mm today`,
+      recommendation,
+      // extra data for UI
+      precipitation_today: totalPrecip.toFixed(1),
+      wind_kph:            windspeed,
+      weathercode,
+      is_stormy:           isStormy,
+      is_rainy:            isRainy,
+    };
+  } catch {
+    return MOCK_FORESTRY_ANALYSIS;
+  }
 };
 
 // --- REAL BACKEND INTEGRATION ---
@@ -278,3 +483,46 @@ export const subscribeToPlan = async (planId, token) => {
     throw error;
   }
 };
+
+export const fetchMySubscription = async (token) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/subscriptions/my-subscription`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) throw new Error('Unauthorized');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Fetch My Subscription Error:", error);
+    return null;
+  }
+};
+
+export const cancelSubscription = async (subscriptionId, token) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/subscriptions/${subscriptionId}/cancel`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to cancel subscription');
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchSubscriptionHistory = async (token) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/subscriptions/history`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (res.status === 401) throw new Error('Unauthorized');
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Fetch Subscription History Error:", error);
+    return [];
+  }
+};
+

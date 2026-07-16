@@ -9,6 +9,7 @@ import SmsDashboard from '../pages/SmsDashboard';
 import Forestry from '../pages/Forestry';
 import PaymentSuccess from '../pages/PaymentSuccess';
 import PaymentCancel from '../pages/PaymentCancel';
+import Profile from '../pages/Profile';
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: '/cancel',
         element: <PaymentCancel />,
+      },
+      {
+        path: '/profile',
+        element: <Profile />,
       },
     ],
   },

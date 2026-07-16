@@ -175,6 +175,24 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.main-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .main-dashboard-grid {
+    grid-template-columns: 1fr 450px;
+    grid-template-areas:
+      "top top"
+      "left right";
+  }
+  .dashboard-top { grid-area: top; }
+  .dashboard-left { grid-area: left; }
+  .dashboard-right { grid-area: right; }
+}
+
 /* Search Bar Styles */
 .search-wrapper {
   position: relative;
