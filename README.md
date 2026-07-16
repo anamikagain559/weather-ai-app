@@ -78,17 +78,4 @@
 
 ---
 
-## 🌍 Deployment
 
-This project is highly optimized for deployment on platforms like Vercel, Netlify, or Render.
-
-**Deploying on Vercel:**
-1. Connect your GitHub repository to your hosting provider.
-2. The `vercel.json` file is already included to handle React Router client-side routing.
-3. Don't forget to add the `VITE_WEATHER_AI_API_KEY` to the Environment Variables section in your deployment dashboard!
-
----
-
-<div align="center">
-  <p><i>Developed for the Weather-AI Engineering Assignment.</i></p>
-</div>
